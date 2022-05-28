@@ -1,23 +1,18 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { generate } from "shortid";
+import { nanoid } from "nanoid";
+import { authMiddleware } from "../middleware/auth.middleware";
 import { UrlModel } from "../models/url.model";
-import { UserModel } from "../models/user.model";
-import { hashText } from "../utils/hash";
 
 const router = Router();
 
 router.post(
-  "/url-shortner",
+  "/short",
+  authMiddleware,
   async (req: Request, res: Response, next: NextFunction): Promise<object> => {
     try {
-      const { apikey, longUrl } = req.body;
-      const hashApiKey = await hashText(apikey);
+      const { longUrl } = req.body;
 
-      const user = await UserModel.findOne({ apikey: hashApiKey });
-
-      if (!user) {
-        return res.status(400).json("Bad Request.");
-      }
+      const user = res.locals.user;
 
       if (user.usages >= user.limit) {
         return res.status(406).json("Your limit is Over.Get Prime right now.");
@@ -26,7 +21,7 @@ router.post(
       const url = await UrlModel.create({
         longUrl,
         userId: user._id,
-        shortId: generate(),
+        shortId: nanoid(),
         domain: "http://localhost:1337",
       });
 
@@ -42,20 +37,17 @@ router.post(
 );
 
 router.get(
-  "/url-shortner",
+  "/get-url-details",
+  authMiddleware,
   async (req: Request, res: Response, next: NextFunction): Promise<object> => {
     try {
-      const { apikey, longUrl } = req.body;
-      const hashApiKey = await hashText(apikey);
+      const { longUrl } = req.body;
 
-      const user = await UserModel.findOne({ apikey: hashApiKey });
+      const user = res.locals.user;
 
-      const urlDetails = await UrlModel.findOne({ longUrl });
+      const urlDetails = await UrlModel.findOne({ longUrl, userId: user._id });
       if (!urlDetails) {
         return res.status(404).json("Not Found.");
-      }
-      if (user._id !== urlDetails.userId) {
-        return res.status(406).json("UnAothorized User.");
       }
 
       return res.status(200).json(urlDetails);
