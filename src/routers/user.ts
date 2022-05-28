@@ -26,7 +26,6 @@ router.post(
         apikey,
       });
     } catch (Error) {
-      console.log({ Error });
       return res.status(500).json({ message: "Server Error." });
     }
   }

@@ -30,7 +30,6 @@ router.post(
 
       return res.status(201).json(url);
     } catch (Error) {
-      console.log({ Error });
       return res.status(500).json({ message: "Server Error." });
     }
   }
@@ -52,7 +51,6 @@ router.get(
 
       return res.status(200).json(urlDetails);
     } catch (Error) {
-      console.log({ Error });
       return res.status(500).json({ message: "Server Error." });
     }
   }
