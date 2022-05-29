@@ -17,8 +17,6 @@ router.post(
 
       const apikey = randomString();
 
-      console.log(apikey);
-
       user = await UserModel.create({
         email,
         domain: user.domain,
