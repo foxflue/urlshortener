@@ -1,9 +1,13 @@
 import { model, Schema } from "mongoose";
 
 const userSchema = new Schema({
-  siteUrl: {
+  email: {
     type: String,
-    required: true,
+    required: [true, "Email is required."],
+  },
+  domain: {
+    type: String,
+    required: [true, "Domain is required."],
   },
   apikey: {
     type: String,
