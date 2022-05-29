@@ -18,4 +18,4 @@ const urlSchema = new Schema({
   },
 });
 
-export const UrlModel = model("UrlModel", urlSchema);
+export const UrlModel = model("urls", urlSchema);
