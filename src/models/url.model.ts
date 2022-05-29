@@ -26,4 +26,4 @@ const urlSchema = new Schema(
 
 urlSchema.index({ shortId: 1 });
 
-export const UrlModel = model("UrlModel", urlSchema);
+export const UrlModel = model("urls", urlSchema);
