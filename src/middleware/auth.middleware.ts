@@ -8,12 +8,17 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   const { apikey } = req.query;
-  const hashApiKey = await hashText(apikey as string);
 
-  const user = await UserModel.findOne({ apikey: hashApiKey });
+  if (!apikey) {
+    return res.status(401).json("API Key is required.");
+  }
+
+  const hashedApiKey = hashText(apikey as string);
+
+  const user = await UserModel.findOne({ apikey: hashedApiKey });
 
   if (!user) {
-    return res.status(400).json("UnAuthorized User.");
+    return res.status(400).json("Unauthorized User.");
   }
 
   res.locals.user = user;
