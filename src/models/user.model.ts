@@ -9,6 +9,10 @@ const userSchema = new Schema({
     type: String,
     required: [true, "Domain is required."],
   },
+  roles: {
+    type: Array,
+    enum: ["user_create", "user_delete", "user_view", "url_create", "url_view"],
+  },
   apikey: {
     type: String,
   },
