@@ -8,7 +8,7 @@ import { createdToken } from "../utils/jwt";
 const router = Router();
 
 router.get(
-  "/users",
+  "/add-users",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       res.render("pages/user", { title: "User", apikey: undefined });
@@ -41,7 +41,7 @@ router.get(
 );
 
 router.post(
-  "/users",
+  "/add-users",
   authMiddleware,
   Role("user_create"),
   async (req: Request, res: Response, next: NextFunction) => {
