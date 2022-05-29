@@ -7,8 +7,8 @@ export const authMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { apikey } = req.body;
-  const hashApiKey = await hashText(apikey);
+  const { apikey } = req.query;
+  const hashApiKey = await hashText(apikey as string);
 
   const user = await UserModel.findOne({ apikey: hashApiKey });
 

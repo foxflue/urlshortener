@@ -28,7 +28,9 @@ router.post(
       user.usages += 1;
       await user.save();
 
-      return res.status(201).json(url);
+      return res.status(201).json({
+        shortId: url.shortId,
+      });
     } catch (Error) {
       return res.status(500).json({ message: "Server Error." });
     }
@@ -36,20 +38,22 @@ router.post(
 );
 
 router.get(
-  "/get-url-details",
+  "/:shortId",
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction): Promise<object> => {
     try {
-      const { longUrl } = req.body;
+      const { shortId } = req.params;
 
       const user = res.locals.user;
 
-      const urlDetails = await UrlModel.findOne({ longUrl, userId: user._id });
+      const urlDetails = await UrlModel.findOne({ shortId, userId: user._id });
       if (!urlDetails) {
         return res.status(404).json("Not Found.");
       }
 
-      return res.status(200).json(urlDetails);
+      return res.status(200).json({
+        longUrl: urlDetails.longUrl,
+      });
     } catch (Error) {
       return res.status(500).json({ message: "Server Error." });
     }
