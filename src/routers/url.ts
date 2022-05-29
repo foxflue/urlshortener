@@ -1,14 +1,27 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
+import { Role } from "../middleware/role.middleware";
 import { UrlModel } from "../models/url.model";
 import { createShortId } from "../utils/createShortId";
 
 const router = Router();
 
+router.get(
+  "/short",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return res.render("pages/url", { title: "Url", shortUrl: undefined });
+    } catch (error) {
+      return res.redirect("/error");
+    }
+  }
+);
+
 router.post(
   "/short",
   authMiddleware,
-  async (req: Request, res: Response, next: NextFunction): Promise<object> => {
+  Role("url_create"),
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { longUrl } = req.body;
 
@@ -34,16 +47,20 @@ router.post(
       user.usages += 1;
       await user.save();
 
-      return res.status(201).json(`${url.domain}/${url.shortId}`);
+      return res.render("pages/url", {
+        title: "Url",
+        shortUrl: `${url.domain}/${url.shortId}`,
+      });
     } catch (Error) {
-      console.log(Error);
-      return res.status(500).json({ message: "Server Error." });
+      return res.redirect('/');
     }
   }
 );
 
 router.get(
   "/:shortId",
+  authMiddleware,
+  Role('url_view'),
   async (
     req: Request,
     res: Response,
@@ -54,12 +71,12 @@ router.get(
 
       const urlDetails = await UrlModel.findOne({ shortId });
       if (!urlDetails) {
-        return res.status(404).json("URL not found.");
+        return res.status(404).send("URL not found.");
       }
       // Redirect to long url
       return res.redirect(urlDetails.longUrl);
     } catch (Error) {
-      return res.status(500).json({ message: "Server Error." });
+      return res.redirect('/error');
     }
   }
 );

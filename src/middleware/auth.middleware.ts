@@ -1,21 +1,29 @@
 import { NextFunction, Request, Response } from "express";
-import { UserModel } from "../models/user.model";
-import { hashText } from "../utils/hash";
+import { tokenVerification } from "../utils/jwt";
+import { UserModel } from './../models/user.model';
+
+type payloadType = {
+  email: string,
+  iat: number,
+  exp: number
+}
 
 export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { apikey } = req.query;
+  const token = req.cookies.secret;
 
-  if (!apikey) {
-    return res.status(401).json("API Key is required.");
+
+  if (!token) {
+    return res.status(401).json("Bad Request");
   }
 
-  const hashedApiKey = hashText(apikey as string);
+  const payload  = await tokenVerification(token) as payloadType;
+ 
 
-  const user = await UserModel.findOne({ apikey: hashedApiKey });
+  const user = await UserModel.findOne({ email: payload.email });
 
   if (!user) {
     return res.status(400).json("Unauthorized User.");
