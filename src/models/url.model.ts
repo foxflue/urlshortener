@@ -1,4 +1,14 @@
 import mongoose, { model, Schema } from "mongoose";
+import { UserDocument } from "./user.model";
+
+export interface UrlDocument extends mongoose.Document{
+  shortId: string,
+  longUrl: string,
+  userID: UserDocument['_id'],
+  domain: string,
+  createdAt: Date,
+  updatedAt : Date
+}
 
 const urlSchema = new Schema(
   {
@@ -26,4 +36,4 @@ const urlSchema = new Schema(
 
 urlSchema.index({ shortId: 1 });
 
-export const UrlModel = model("urls", urlSchema);
+export const UrlModel = model<UrlDocument>("urls", urlSchema);
