@@ -22,6 +22,10 @@
       <% if(apikey){ %>
       <p class="mt-2">APi Key : <%= apikey %></p>
       <% }%>
+
+      <% if(error){ %>
+        <p class="mt-2" style="color: red"><%= error %></p>
+        <% }%>
     </div>
   </div>
 </section>

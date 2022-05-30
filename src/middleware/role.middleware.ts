@@ -5,7 +5,7 @@ export const Role = (role: string) => {
     const user = res.locals.user;
 
     if (!user.roles.includes(role)) {
-      return res.status(406).send("Unathorized user.");
+      return res.render("pages/user", { title : "User", apikey : undefined, error : 'Unauthorized User'});
     }
 
     next();

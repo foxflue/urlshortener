@@ -1,37 +1,25 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { authMiddleware } from "../middleware/auth.middleware";
-import { Role } from "../middleware/role.middleware";
-import { validate } from "../middleware/validate.resource";
 import { UrlModel } from "../models/url.model";
-import { getUrlSchema, postUrlSchema } from "../schema/url.schem";
+import { UserDocument, UserModel } from "../models/user.model";
 import { createShortId } from "../utils/createShortId";
+import { hashText } from "../utils/hash";
 
 const router = Router();
 
-router.get(
-  "/short",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      return res.render("pages/url", { title: "Url", shortUrl: undefined });
-    } catch (error) {
-      return res.redirect("/error");
-    }
-  }
-);
-
 router.post(
   "/short",
-  authMiddleware,
-  Role("url_create"),
-  validate(postUrlSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { longUrl } = req.body;
+      const { longUrl, apikey } = req.body;
+      const hashedApiKey = hashText(apikey);
 
-      const user = res.locals.user;
+      const user = (await UserModel.findOne({ apikey: hashedApiKey })) as UserDocument;
 
+      if (!user) {
+        return res.status(404).json({ message: "User Not Found." });
+      }
       if (user.usages >= user.limit) {
-        return res.status(406).json("Limit Exceeded.");
+        return res.status(406).json({message : "Limit Exceeded."});
       }
 
       let shortId = createShortId();
@@ -50,21 +38,18 @@ router.post(
       user.usages += 1;
       await user.save();
 
-      return res.render("pages/url", {
-        title: "Url",
-        shortUrl: `${url.domain}/${url.shortId}`,
-      });
+     return res.status(200).json({
+        shortUrl : `${url.domain}/${url.shortId}`
+      })
+      
     } catch (Error) {
-      return res.redirect('/');
+      return res.status(500).json({Message : 'Server Error'});
     }
   }
 );
 
 router.get(
   "/:shortId",
-  authMiddleware,
-  Role('url_view'),
-  validate(getUrlSchema),
   async (
     req: Request,
     res: Response,
@@ -80,7 +65,7 @@ router.get(
       // Redirect to long url
       return res.redirect(urlDetails.longUrl);
     } catch (Error) {
-      return res.redirect('/error');
+      return res.status(500).json({Message : 'Server Error'});
     }
   }
 );

@@ -26,7 +26,7 @@ export const authMiddleware = async (
   const user = await UserModel.findOne({ email: payload.email });
 
   if (!user) {
-    return res.send("Unauthorized User.");
+    return res.render("pages/user", { title : "User", apikey : undefined, error : 'Unauthorized User'});
   }
 
   res.locals.user = user;
