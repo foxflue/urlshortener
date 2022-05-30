@@ -29,7 +29,7 @@ router.get(
   "/login",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.render("pages/login", { title: "Login", error: undefined });
+     return res.render("pages/login", { title: "Login", error: undefined });
     } catch (error) {
       return res.redirect("/error");
     }
@@ -41,7 +41,7 @@ router.get(
   isLoggedIn,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.render("pages/logout", { title: "Logout" });
+     return res.render("pages/logout", { title: "Logout" });
     } catch (error) {
       return res.redirect("/error");
     }
