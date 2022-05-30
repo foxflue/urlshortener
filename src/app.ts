@@ -22,14 +22,6 @@ app.use(express.static(path.join(__dirname, "../public")));
 console.log(path.join(__dirname, "../public"));
 
 mongoConnect();
-
-app.get('/', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    return res.render('pages/home', { title: 'Home' });
-  } catch (error) {
-    return res.redirect('/error');
-  }
-})
  
 app.use(userRouter);
 app.use(urlRouter);
