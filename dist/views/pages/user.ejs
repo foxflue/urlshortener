@@ -1,0 +1,33 @@
+<%- include('../templates/header'); -%>
+<%- include('../templates/nav'); -%>
+<section class="py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <form class="container" action="/add-users" method="POST">
+        <h2>Add User</h2>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="text" name="email" class="form-control" id="email" />
+        </div>
+
+        <div class="form-group">
+          <label for="domain">Domain</label>
+          <input type="text" name="domain" class="form-control" id="domain" />
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-2">Add</button>
+      </form>
+
+      <% if(apikey){ %>
+      <p class="mt-2">APi Key : <%= apikey %></p>
+      <% }%>
+
+      <% if(error){ %>
+        <p class="mt-2" style="color: red"><%= error %></p>
+        <% }%>
+    </div>
+  </div>
+</section>
+
+<%- include('../templates/footer'); -%>
