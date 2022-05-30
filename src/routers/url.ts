@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { validatedUser } from "../middleware/validate.user.middleware";
+import { apiAuth } from "../middleware/api.middleware";
 import { UrlModel } from "../models/url.model";
 import { createShortId } from "../utils/createShortId";
 
@@ -7,14 +7,14 @@ const router = Router();
 
 router.post(
   "/short",
-  validatedUser,
+  apiAuth,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { longUrl } = req.body;
-      
+
       const user = res.locals.user;
       if (user.usages >= user.limit) {
-        return res.status(406).json({message : "Limit Exceeded."});
+        return res.status(406).json({ message: "Limit Exceeded." });
       }
 
       let shortId = createShortId();
@@ -33,12 +33,11 @@ router.post(
       user.usages += 1;
       await user.save();
 
-     return res.status(200).json({
-        shortUrl : `${url.domain}/${url.shortId}`
-      })
-      
+      return res.status(200).json({
+        shortUrl: `${url.domain}/${url.shortId}`,
+      });
     } catch (Error) {
-      return res.status(500).json({Message : 'Server Error'});
+      return res.status(500).json({ Message: "Server Error" });
     }
   }
 );
@@ -60,7 +59,7 @@ router.get(
       // Redirect to long url
       return res.redirect(urlDetails.longUrl);
     } catch (Error) {
-      return res.status(500).json({Message : 'Server Error'});
+      return res.status(500).json({ Message: "Server Error" });
     }
   }
 );
