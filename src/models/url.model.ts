@@ -19,6 +19,7 @@ const urlSchema = new Schema(
     },
     longUrl: {
       type: String,
+      required: true
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,

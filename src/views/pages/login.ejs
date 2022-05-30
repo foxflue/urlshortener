@@ -18,6 +18,10 @@
       
         <button type="submit" class="btn btn-primary mt-2">Login</button>
       </form>
+
+      <% if(error) {%>
+        <p class="ma-5" style="color:red ;"> <%= error %></p>
+      <%}%>
     </div>
   </div>
 

@@ -17,7 +17,7 @@ export const authMiddleware = async (
 
 
   if (!token) {
-    return res.status(401).json("Bad Request");
+    return res.redirect('/login');
   }
 
   const payload  = await tokenVerification(token) as payloadType;
@@ -26,7 +26,7 @@ export const authMiddleware = async (
   const user = await UserModel.findOne({ email: payload.email });
 
   if (!user) {
-    return res.status(400).json("Unauthorized User.");
+    return res.send("Unauthorized User.");
   }
 
   res.locals.user = user;

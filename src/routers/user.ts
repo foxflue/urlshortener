@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { Role } from "../middleware/role.middleware";
-import { UserModel } from "../models/user.model";
+import { validate } from "../middleware/validate.resource";
+import { UserDocument, UserModel } from "../models/user.model";
+import { loginSchema, userSchema } from "../schema/user.schema";
 import { hashText, randomString } from "../utils/hash";
 import { createdToken } from "../utils/jwt";
 
@@ -22,7 +24,7 @@ router.get(
   "/login",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.render("pages/login", { title: "Login" });
+      res.render("pages/login", { title: "Login", error: undefined });
     } catch (error) {
       return res.redirect("/error");
     }
@@ -44,13 +46,14 @@ router.post(
   "/add-users",
   authMiddleware,
   Role("user_create"),
+  validate(userSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, domain } = req.body;
 
-      let user = await UserModel.findOne({ email });
+      let user = (await UserModel.findOne({ email })) as UserDocument;
       if (user) {
-        return res.status(200).json(user);
+        return res.render("pages/user", { title: "User", apikey : user.apikey });
       }
 
       const apikey = randomString();
@@ -61,7 +64,7 @@ router.post(
         apikey: hashText(apikey),
       });
 
-      res.render("pages/user", { title: "User", apikey });
+      return res.render("pages/user", { title: "User", apikey });
     } catch (Error) {
       return res.redirect("/error");
     }
@@ -70,6 +73,7 @@ router.post(
 
 router.post(
   "/login",
+  validate(loginSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, apikey } = req.body;
@@ -87,7 +91,7 @@ router.post(
 
       return res.redirect("/");
     } catch (error) {
-      return res.redirect("/error");
+      return res.render('pages/login', { error });
     }
   }
 );

@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { Role } from "../middleware/role.middleware";
+import { validate } from "../middleware/validate.resource";
 import { UrlModel } from "../models/url.model";
+import { getUrlSchema, postUrlSchema } from "../schema/url.schem";
 import { createShortId } from "../utils/createShortId";
 
 const router = Router();
@@ -21,6 +23,7 @@ router.post(
   "/short",
   authMiddleware,
   Role("url_create"),
+  validate(postUrlSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { longUrl } = req.body;
@@ -61,6 +64,7 @@ router.get(
   "/:shortId",
   authMiddleware,
   Role('url_view'),
+  validate(getUrlSchema),
   async (
     req: Request,
     res: Response,
