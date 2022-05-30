@@ -1,23 +1,18 @@
 import { NextFunction, Request, Response, Router } from "express";
+import { validatedUser } from "../middleware/validate.user.middleware";
 import { UrlModel } from "../models/url.model";
-import { UserDocument, UserModel } from "../models/user.model";
 import { createShortId } from "../utils/createShortId";
-import { hashText } from "../utils/hash";
 
 const router = Router();
 
 router.post(
   "/short",
+  validatedUser,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { longUrl, apikey } = req.body;
-      const hashedApiKey = hashText(apikey);
-
-      const user = (await UserModel.findOne({ apikey: hashedApiKey })) as UserDocument;
-
-      if (!user) {
-        return res.status(404).json({ message: "User Not Found." });
-      }
+      const { longUrl } = req.body;
+      
+      const user = res.locals.user;
       if (user.usages >= user.limit) {
         return res.status(406).json({message : "Limit Exceeded."});
       }
