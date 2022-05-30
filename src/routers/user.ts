@@ -14,7 +14,11 @@ router.get(
   isLoggedIn,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      return res.render("pages/user", { title: "User", apikey: undefined , error : undefined});
+      return res.render("pages/user", {
+        title: "User",
+        apikey: undefined,
+        error: undefined,
+      });
     } catch (error) {
       return res.redirect("/error");
     }
@@ -60,7 +64,11 @@ router.post(
 
       let user = (await UserModel.findOne({ email })) as UserDocument;
       if (user) {
-        return res.render("pages/user", { title: "User", apikey: user.apikey , error: undefined});
+        return res.render("pages/user", {
+          title: "User",
+          apikey: user.apikey,
+          error: undefined,
+        });
       }
 
       const apikey = randomString();
@@ -71,9 +79,17 @@ router.post(
         apikey: hashText(apikey),
       });
 
-      return res.render("pages/user", { title: "User", apikey , error : undefined});
+      return res.render("pages/user", {
+        title: "User",
+        apikey,
+        error: undefined,
+      });
     } catch (error) {
-      return res.render("pages/user", { title : "User", apikey : undefined, error });
+      return res.render("pages/user", {
+        title: "User",
+        apikey: undefined,
+        error,
+      });
     }
   }
 );
@@ -94,7 +110,10 @@ router.post(
       const user = await UserModel.findOne({ email, apikey: hashedApiKey });
 
       if (!user) {
-        return res.render("pages/login", { title : 'Login', error : "User Not Found."});
+        return res.render("pages/login", {
+          title: "Login",
+          error: "User Not Found.",
+        });
       }
 
       const token = await createdToken(user.email);
